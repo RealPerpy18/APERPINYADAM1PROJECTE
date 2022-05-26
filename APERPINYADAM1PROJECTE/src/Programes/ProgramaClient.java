@@ -4,9 +4,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Scanner;
 import Validacions.validacions;
-public class ClientMain {
+public class ProgramaClient {
 
 	public static void main(String[] args) {
 		Scanner lector=new Scanner (System.in);
@@ -119,7 +120,7 @@ public class ClientMain {
 					} catch (SQLException e2) {
 						e2.printStackTrace();
 					}
-//------------------------------------------------------------------------------------------------MENU CLIENT----------------------------------------------------------
+					//------------------------------------------------------------------------------------------------MENU CLIENT----------------------------------------------------------
 					do {
 						System.out.println("\tMENU CLIENT\n");
 						System.out.println("1. Comprar\n2. Editar dades compte\n3. Donar-se de baixa\n 4. Tanca Sessió");
@@ -128,9 +129,64 @@ public class ClientMain {
 
 						switch(opcio) {
 						case 1:
+							ArrayList<LiniaFactura>a=new ArrayList<LiniaFactura>();
+							int producte=0;
+							String op="a";
 
+							try {
+								System.out.println(llistaProductes());
+							} catch (SQLException e2) {
+								e2.printStackTrace();
+							}
+							boolean compra=false;
+							do {
+								if(producte==0) {
+									System.out.println("Vols realitzar la compra? S/n");
+									op=lector.next();
+									if (op=="s"||op=="S") {
 
+									}
+									if(op=="n"||op=="N") {
 
+									}
+
+								}
+								else if(producte==1) {
+									System.out.println(carret(a));	
+									
+									}
+								else {
+									int unitats=0;
+									do {
+										System.out.println("Cuantes unitats del producte vols?");
+										unitats=lector.nextInt();
+										lector.nextLine();}
+									while(lector.hasNextInt());
+										
+										LiniaFactura aux=new LiniaFactura();
+										try {
+											aux.producte=carregarObjecte(producte);
+										} catch (SQLException e) {
+											e.printStackTrace();
+										}
+
+										aux.unitat=unitats;
+										a.add(aux);
+									
+									
+									try {
+										System.out.println(llistaProductes());
+									} catch (SQLException e2) {
+										e2.printStackTrace();
+									}
+
+								}
+
+							}
+							while(producte!=0);
+							if(compra) {
+
+							}
 
 
 
@@ -188,7 +244,7 @@ public class ClientMain {
 
 				}
 				break;
-//-----------------------------------------------------------------------------------FI MENU CLIENT-------------------------------------------------------------------------
+				//-----------------------------------------------------------------------------------FI MENU CLIENT-------------------------------------------------------------------------
 
 
 
@@ -274,15 +330,15 @@ public class ClientMain {
 			System.out.println(rs.getString("nom"));
 		}
 	}
-	
-	
-	
+
+
+
 	public static void altaClient(String dni,String nom, String correu, String telefon, String adreca, String contrasenya)throws SQLException {
 
 		Connection con=DriverManager.getConnection("jdbc:postgresql://localhost:5432/botigaonline","postgres","1234");    
 		Statement stmt=con.createStatement();
 		stmt.executeUpdate("Insert into client values(\'"+dni+"\',\'"+nom+"\',\'"+correu+"\',\'"+telefon+"\',\'"+adreca+"\',\'"+contrasenya+"\');");
-		
+
 
 
 
@@ -312,5 +368,46 @@ public class ClientMain {
 			rs.updateString(columna,dada);
 			rs.updateRow();
 		}
+	}
+	public static String llistaProductes() throws SQLException {
+		String llista="";
+		String categoria="a";
+		Connection con=DriverManager.getConnection("jdbc:postgresql://localhost:5432/botigaonline","postgres","1234");    
+		Statement stmt=con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE );
+		String sql="select * from producte group by seccio,codi order by codi;";
+		ResultSet rs=stmt.executeQuery(sql);
+
+		while (rs.next()) {
+
+			if(!categoria.equalsIgnoreCase(rs.getString("seccio"))){
+				categoria=rs.getString("seccio");
+				llista=llista+categoria+"\n";
+			}
+			categoria=rs.getString("seccio");
+
+			llista=llista+" \t-"+rs.getInt("codi")+" "+rs.getString("descripcio")+" "+rs.getInt("stock")+" "+rs.getDouble("preu")+"€ "+rs.getInt("iva")+"%\n";
+		}
+		return llista;
+	}
+	public static Producte carregarObjecte(int codi) throws SQLException {
+
+		Connection con=DriverManager.getConnection("jdbc:postgresql://localhost:5432/botigaonline","postgres","1234");    
+		Statement stmt=con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE );
+		String sql="select * from producte where codi=\'"+codi+"\'";
+		ResultSet rs=stmt.executeQuery(sql);
+		Producte p1=new Producte(rs.getInt("codi"),rs.getString("descripcio"),rs.getString("seccio"),rs.getInt("stock"),rs.getDouble("preu"),rs.getInt("iva"));
+		return p1;
+	}
+	public static String carret(ArrayList<LiniaFactura>a){
+		String carret="";
+		double preuiva=0;
+		double total=0;
+		for(int i=0;i<a.size();i++) {
+			preuiva=a.get(i).unitat*(a.get(i).producte.preu+(a.get(i).producte.preu/100*a.get(i).producte.iva));
+			carret=carret+i+1+" "+a.get(i).producte.nom+" "+a.get(i).producte.preu+"€ "+a.get(i).unitat +" "+a.get(i).producte.iva+"% "+a.get(i).producte.preu*a.get(i).producte.preu+" "+preuiva+"€\n";
+			total=total+preuiva;
+		}
+		carret=carret+total+"€\n\n";
+		return carret;
 	}
 }
