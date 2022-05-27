@@ -13,19 +13,15 @@ public class ProgramaEmpresa {
 		Scanner lector=new Scanner (System.in);
 		int opcio=0;	
 		do {
-			System.out.println("\n\n\n\tMENU BOTIGA\n\n1.Gestio de productes\n2.Dades Clients");
-			if(lector.hasNextInt()) {
-				opcio=lector.nextInt();
-				lector.nextLine();
-			}
+			System.out.println("\n\n\n\tMENU BOTIGA\n\n1.Gestio de productes\n2.Dades Clients\n3.Tancar Programa");
+				opcio=verificarInt(opcio);
 			switch (opcio){
 			case 1:
 				do {
-					System.out.println("\n\n\n\tGESTIO PRODUCTES\n1.Alta productes\n2.Modificar Productes\n3.Baixa Producte");
-					if(lector.hasNextInt()) {
-						opcio=lector.nextInt();
-						lector.nextLine();
-					}
+					System.out.println("\n\n\n\tGESTIO PRODUCTES\n1.Alta productes\n2.Modificar Productes\n3.Baixa Producte\n4. Tornar Enrere");
+						opcio=verificarInt(opcio);
+
+					
 					switch(opcio) {
 					case 1:
 						double preu=0.0;
@@ -37,50 +33,18 @@ public class ProgramaEmpresa {
 						String seccio=lector.nextLine();
 
 						System.out.println("Preu de venda al public:");
-						boolean valid=false;
-						do {
-
-							if (lector.hasNextDouble()) {
-								preu=lector.nextDouble();
-								lector.nextLine();
-								valid=true;
-							}
-							else {
-								System.out.println("Format incorrecte, introdueix de nou");
-							}
+						preu=verificarDouble(preu);
 
 
-						}
-						while(!valid);
+
+
 
 						System.out.println("Stock inicial:");
-						valid=false;
-						do {
-							if (lector.hasNextInt()) {
-								stock=lector.nextInt();
-								lector.nextLine();
-								valid=true;
-							}
-							else {
-								System.out.println("Format incorrecte, introdueix de nou");
-							}
-						}
-						while(!valid);
+						stock=verificarInt(stock);
 
 
 						System.out.println("Iva del producte");
-						valid=false;
-						do {
-							if (lector.hasNextInt()) {
-								iva=lector.nextInt();
-								lector.nextLine();
-								valid=true;
-							}
-							else {
-								System.out.println("Format incorrecte, introdueix de nou");
-							}
-						}
-						while(!valid);
+						iva=verificarInt(iva);
 
 
 						try {
@@ -97,38 +61,37 @@ public class ProgramaEmpresa {
 							e1.printStackTrace();
 						}
 						System.out.println("Introdueix el codi del producte a modificar");
-						int codi=lector.nextInt();
-						lector.nextLine();
+						int codi=0;
+						codi=verificarInt(codi);
+						if (codi>1000) {
 						try {
 
 							Producte p1=carregarObjecte(codi);
 							System.out.println(p1.getDadesModificables());
 							do {
 								System.out.println("Dades per modificar\n\n\t1.Preu\n\t2.IVA\n\t3.Stock");
-								opcio=lector.nextInt();
-								lector.nextLine();
+								opcio=verificarInt(opcio);
 
 								if (opcio==1) {
 									System.out.println("Introdueix el nou preu");
-									if (lector.hasNextDouble()) {
-										double canvipreu=lector.nextDouble();
-										lector.nextLine();
-										modificarProducte(p1,"preu",canvipreu);
-									}
+									double canvipreu=0;
+									canvipreu=verificarDouble(canvipreu);
+									modificarProducte(p1,"preu",canvipreu);
+
 								}
 								else if(opcio==2) {
 									System.out.println("Introdueix el nou IVA");
 									if (lector.hasNextInt()) {
-										int nouiva=lector.nextInt();
-										lector.nextLine();
+										int nouiva=0;
+										nouiva=verificarInt(nouiva);
 										modificarProducteInt(p1,"iva",nouiva);
 									}
 								}
 								else if(opcio==3) {
 									System.out.println("Introdueix Cantitat de Stock");
 									if (lector.hasNextInt()) {
-										int noustock=lector.nextInt();
-										lector.nextLine();
+										int noustock=0;
+										noustock=verificarInt(noustock);
 										modificarProducteInt(p1,"stock",noustock);
 									}
 								}
@@ -142,6 +105,7 @@ public class ProgramaEmpresa {
 						catch (SQLException e2) {
 							e2.printStackTrace();
 						}
+						}
 						break;
 					case 3:
 						try {
@@ -150,10 +114,10 @@ public class ProgramaEmpresa {
 							e1.printStackTrace();
 						}
 						System.out.println("Introdueix el codi del producte a eliminar");
-						codi=lector.nextInt();
-						lector.nextLine();
+						int codi1=0;
+						codi1=verificarInt(codi1);
 						try {
-							System.out.println(eliminarProducte(codi));
+							System.out.println(eliminarProducte(codi1));
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -163,12 +127,14 @@ public class ProgramaEmpresa {
 				break;
 
 			case 2:
+				int opcio2=0;
+
 				do {
+
 					System.out.println("\n\n\n\tMENU GESTIO CLIENT\n\n1.Visualitza dades d'un client\n2.visualitza clients\n3.Tornar al menú anterior");
-					if(lector.hasNextInt()) {
-						opcio=lector.nextInt();
-						lector.nextLine();
-						switch(opcio) {
+						opcio2=verificarInt(opcio2);
+
+						switch(opcio2) {
 						case 1:
 							System.out.println("dni del client");
 							String dni=lector.nextLine();
@@ -188,14 +154,14 @@ public class ProgramaEmpresa {
 							lector.nextLine();
 							break;
 						}
-					}
+					
 				}
-				while(opcio!=3);
+				while(opcio2!=3);
 
 				break;
 			}
 		}
-		while (opcio!=111);
+		while (opcio!=3);
 	}
 	public static String visualitzaClient(String dni) throws SQLException {
 		Connection con=DriverManager.getConnection("jdbc:postgresql://localhost:5432/botigaonline","postgres","1234");    
@@ -215,8 +181,9 @@ public class ProgramaEmpresa {
 		String sql="select * from client";
 		ResultSet rs=stmt.executeQuery(sql);
 		String llista="";
+		llista=llista+"\n\n\tLLISTA DE CLIENTS";
 		while(rs.next()) {
-			llista= rs.getString("nom")+" \n-dni: "+rs.getString("dni")+"  -eMail: "+rs.getString("correu")+"  -Telefon: "+rs.getString("telefon")+"  -Adreça: "+rs.getString("adreca");
+			llista=llista+"\n"+rs.getString("nom")+" \ndni: "+rs.getString("dni")+"  eMail: "+rs.getString("correu")+"  Telefon: "+rs.getString("telefon")+"  Adreça: "+rs.getString("adreca")+"\n\n";
 		}
 		return llista;
 	}
@@ -285,9 +252,9 @@ public class ProgramaEmpresa {
 		String categoria="a";
 		Connection con=DriverManager.getConnection("jdbc:postgresql://localhost:5432/botigaonline","postgres","1234");    
 		Statement stmt=con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE );
-		String sql="select * from producte group by seccio,codi order by codi;";
+		String sql="select * from producte group by seccio,codi order by seccio, codi;";
 		ResultSet rs=stmt.executeQuery(sql);
-
+		llista=llista+"\n\n\t\tLLISTA DE PRODUCTES\n";
 		while (rs.next()) {
 
 			if(!categoria.equalsIgnoreCase(rs.getString("seccio"))){
@@ -296,9 +263,45 @@ public class ProgramaEmpresa {
 			}
 			categoria=rs.getString("seccio");
 
-			llista=llista+" \t-"+rs.getInt("codi")+" "+rs.getString("descripcio")+" "+rs.getInt("stock")+" "+rs.getDouble("preu")+"€ "+rs.getInt("iva")+"%\n";
+			llista=llista+" \t"+rs.getInt("codi")+" "+rs.getString("descripcio")+"\tStock: "+rs.getInt("stock")+" "+rs.getDouble("preu")+"€ "+rs.getInt("iva")+"%\n";
 		}
 		return llista;
+	}
+	public static double verificarDouble(double n) {
+		Scanner lector = new Scanner(System.in);
+		boolean funciona = lector.hasNextDouble();     
+		if(funciona) { 
+			n = lector.nextDouble(); lector.nextLine(); 
+		}
+		else {
+			while((!funciona)) { 
+				lector.nextLine();         
+				System.out.println("Format incorrecte, introdueix de nou"); 
+				funciona = lector.hasNextDouble(); 
+				if(funciona) {
+					n = lector.nextDouble(); lector.nextLine();
+				}
+			}
+		}
+		return n;
+	}
+	public static int verificarInt(int n) {
+		Scanner lector = new Scanner(System.in);
+		boolean funciona = lector.hasNextInt();     
+		if(funciona) { 
+			n = lector.nextInt(); lector.nextLine(); 
+		}
+		else {
+			while((!funciona)) { 
+				lector.nextLine();         
+				System.out.println("Format incorrecte, introdueix de nou"); 
+				funciona = lector.hasNextInt(); 
+				if(funciona) { 
+					n = lector.nextInt(); lector.nextLine();
+				}
+			}
+		}
+		return n;
 	}
 }
 
